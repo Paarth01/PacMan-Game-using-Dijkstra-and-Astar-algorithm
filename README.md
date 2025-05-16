@@ -66,6 +66,7 @@ PacMan-Game-using-Dijkstra-and-Astar-algorithm/
 ├── LICENSE                # GPL-3.0 License
 └── .gitignore             # Git ignore file
 
+
 ## 🧩 Planned Features
 
 - ⏩ Speed boost, invisibility, and teleportation power-ups  
