@@ -12,7 +12,7 @@ A 2D reimagining of the classic **Pac-Man** game developed in **Python (Pygame)*
 
 ## 📸 Preview
 
-![Game Screenshot](assets/screenshot.png) <!-- Add a screenshot here if available -->
+![Game Screenshot](image.png) <!-- Add a screenshot here if available -->
 
 ## 🛠️ Technologies Used
 
