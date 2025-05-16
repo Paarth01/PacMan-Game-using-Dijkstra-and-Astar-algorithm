@@ -88,7 +88,7 @@ Contributions are welcome! If you have ideas for features, bug fixes, or optimiz
 
 ## 📜 License
 
-This project is open-source and available under the [MIT License](LICENSE).
+This project is licensed under the [GNU General Public License v3.0](LICENSE).:contentReference[oaicite:18]{index=18}
 
 ## 🙌 Acknowledgements
 
