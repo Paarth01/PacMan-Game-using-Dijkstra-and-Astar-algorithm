@@ -57,17 +57,14 @@ You can toggle between the two algorithms in the game or code by selecting the d
 
 ## 📂 Project Structure
 
-```plaintext
-├── main.py              # Entry point of the game
-├── game/                # Contains core game logic and modules
-│   ├── grid.py          # Map layout and grid representation
-│   ├── player.py        # Pac-Man movement and control
-│   ├── ghost.py         # Ghost behavior and pathfinding
-│   ├── dijkstra.py      # Dijkstra algorithm implementation
-│   ├── astar.py         # A* algorithm implementation
-├── assets/              # Sprites, sounds, etc.
-└── README.md
-```
+PacMan-Game-using-Dijkstra-and-Astar-algorithm/
+│
+├── astar.py               # A* pathfinding algorithm
+├── dijkstra.py            # Dijkstra's pathfinding algorithm
+├── main.py                # Main game loop and initialization
+├── README.md              # Project overview and instructions
+├── LICENSE                # GPL-3.0 License
+└── .gitignore             # Git ignore file
 
 ## 🧩 Planned Features
 
