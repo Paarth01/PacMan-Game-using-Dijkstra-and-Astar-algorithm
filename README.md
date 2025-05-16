@@ -1,3 +1,5 @@
+![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg):contentReference[oaicite:24]{index=24}
+
 # 🟡 Pac-Man Game using Dijkstra and A* Algorithm
 
 A 2D reimagining of the classic **Pac-Man** game developed in **Python (Pygame)**, featuring advanced ghost AI that uses **Dijkstra’s** and **A\*** pathfinding algorithms to chase the player intelligently.
