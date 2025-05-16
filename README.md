@@ -56,7 +56,7 @@ An optimized version of Dijkstra’s that uses **heuristics** (like Manhattan di
 You can toggle between the two algorithms in the game or code by selecting the desired function in the ghost AI logic.
 
 ## 📂 Project Structure
-
+```bash
 PacMan-Game-using-Dijkstra-and-Astar-algorithm/
 │
 ├── astar.py               # A* pathfinding algorithm
@@ -65,7 +65,7 @@ PacMan-Game-using-Dijkstra-and-Astar-algorithm/
 ├── README.md              # Project overview and instructions
 ├── LICENSE                # GPL-3.0 License
 └── .gitignore             # Git ignore file
-
+```
 
 ## 🧩 Planned Features
 
