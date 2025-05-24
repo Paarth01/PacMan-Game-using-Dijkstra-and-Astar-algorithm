@@ -22,7 +22,7 @@ Pac-Man finds and follows the shortest path to the nearest pellet using A* or Di
 ### 🎮 Ghost Auto-Pilot Mode
 Ghosts find and follow the shortest path to the nearest pellet using A* or Dijkstra.
 
-<img src="ghost_astar.gif" width="400"/>
+<img src="ghost_auto.gif" width="400"/>
 
 ## 🛠️ Technologies Used
 
