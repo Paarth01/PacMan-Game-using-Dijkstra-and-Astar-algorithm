@@ -159,6 +159,10 @@ def main():
 
     running = True
     paused = False
+    debug_mode = False  # Debug mode flag
+    auto_pilot = False  # Auto-Pilot mode
+    auto_pilot_path = []  # Current path Pac-Man should follow
+    auto_pilot_target = None  # (x, y) of current pellet target
 
     while running:
         lost_life = False
@@ -174,16 +178,26 @@ def main():
                     paused = not paused
                 if paused:
                     continue
+                if event.key == pygame.K_a:
+                    auto_pilot = not auto_pilot
+                    auto_pilot_path = []
+                    auto_pilot_target = None
                 if event.key == pygame.K_LEFT:
                     pacman.next_dir = (-1, 0)
+                    auto_pilot = False
                 elif event.key == pygame.K_RIGHT:
                     pacman.next_dir = (1, 0)
+                    auto_pilot = False
                 elif event.key == pygame.K_UP:
                     pacman.next_dir = (0, -1)
+                    auto_pilot = False
                 elif event.key == pygame.K_DOWN:
                     pacman.next_dir = (0, 1)
+                    auto_pilot = False
                 elif event.key == pygame.K_TAB:
                     algorithm = "astar" if algorithm == "dijkstra" else "dijkstra"
+                elif event.key == pygame.K_d:
+                    debug_mode = not debug_mode
 
         if paused:
             # Draw "PAUSED" message
@@ -194,12 +208,110 @@ def main():
             clock.tick(10)
             continue
 
-        # Move Pac-Man
-        nx, ny = pacman.x + pacman.next_dir[0], pacman.y + pacman.next_dir[1]
-        if is_walkable(nx, ny, MAZE):
-            pacman.dir = pacman.next_dir
-        pacman.move_with_delay(MAZE)
-        pacman.animate_mouth()
+        # --- Auto-Pilot Logic ---
+        def find_nearest_pellet(start_x, start_y, maze):
+            from collections import deque
+            visited = [[False for _ in range(COLS)] for _ in range(ROWS)]
+            queue = deque()
+            queue.append((start_x, start_y, 0))
+            visited[start_y][start_x] = True
+            while queue:
+                x, y, dist = queue.popleft()
+                if maze[y][x] == 0 or maze[y][x] == 3:
+                    return (x, y)
+                for dx, dy in [(1,0),(-1,0),(0,1),(0,-1)]:
+                    nx, ny = x + dx, y + dy
+                    if 0 <= nx < COLS and 0 <= ny < ROWS and not visited[ny][nx] and maze[ny][nx] != 1:
+                        visited[ny][nx] = True
+                        queue.append((nx, ny, dist+1))
+            return None
+
+        def get_path(start, goal, maze, algorithm):
+            # Returns a list of (x, y) positions from start to goal (including both)
+            import heapq
+            directions = [(1,0), (-1,0), (0,1), (0,-1)]
+            ROWS, COLS = len(maze), len(maze[0])
+            dist = [[float('inf') for _ in range(COLS)] for _ in range(ROWS)]
+            prev = [[None for _ in range(COLS)] for _ in range(ROWS)]
+            if algorithm == "dijkstra":
+                heap = []
+                heapq.heappush(heap, (0, start[0], start[1]))
+                dist[start[1]][start[0]] = 0
+                while heap:
+                    cost, x, y = heapq.heappop(heap)
+                    if (x, y) == goal:
+                        break
+                    for dx, dy in directions:
+                        nx, ny = x + dx, y + dy
+                        if 0 <= nx < COLS and 0 <= ny < ROWS and maze[ny][nx] != 1:
+                            new_cost = cost + 1
+                            if new_cost < dist[ny][nx]:
+                                dist[ny][nx] = new_cost
+                                prev[ny][nx] = (x, y)
+                                heapq.heappush(heap, (new_cost, nx, ny))
+            else:  # astar
+                def heuristic(x, y):
+                    return abs(x - goal[0]) + abs(y - goal[1])
+                heap = []
+                heapq.heappush(heap, (heuristic(start[0], start[1]), 0, start[0], start[1]))
+                dist[start[1]][start[0]] = 0
+                while heap:
+                    f, cost, x, y = heapq.heappop(heap)
+                    if (x, y) == goal:
+                        break
+                    for dx, dy in directions:
+                        nx, ny = x + dx, y + dy
+                        if 0 <= nx < COLS and 0 <= ny < ROWS and maze[ny][nx] != 1:
+                            new_cost = cost + 1
+                            if new_cost < dist[ny][nx]:
+                                dist[ny][nx] = new_cost
+                                prev[ny][nx] = (x, y)
+                                heapq.heappush(heap, (new_cost + heuristic(nx, ny), new_cost, nx, ny))
+            # Reconstruct path
+            path = []
+            x, y = goal
+            while prev[y][x] is not None and (x, y) != start:
+                path.append((x, y))
+                x, y = prev[y][x]
+            if (x, y) == start:
+                path.append((x, y))
+                path.reverse()
+                return path
+            return []
+
+        # --- Pac-Man Movement ---
+        if auto_pilot:
+            # If no path or target invalid, recalculate
+            if not auto_pilot_path or auto_pilot_target is None or MAZE[auto_pilot_target[1]][auto_pilot_target[0]] not in [0,3]:
+                target = find_nearest_pellet(pacman.x, pacman.y, MAZE)
+                if target:
+                    auto_pilot_target = target
+                    path = get_path((pacman.x, pacman.y), auto_pilot_target, MAZE, algorithm)
+                    auto_pilot_path = path[1:] if len(path) > 1 else []  # skip current pos
+                else:
+                    auto_pilot_path = []
+                    auto_pilot_target = None
+            # Move along path if there is one
+            if auto_pilot_path:
+                next_pos = auto_pilot_path[0]
+                dx, dy = next_pos[0] - pacman.x, next_pos[1] - pacman.y
+                pacman.next_dir = (dx, dy)
+                nx, ny = pacman.x + dx, pacman.y + dy
+                if is_walkable(nx, ny, MAZE):
+                    pacman.dir = pacman.next_dir
+                pacman.move_with_delay(MAZE)
+                pacman.animate_mouth()
+                # If reached next step, pop it
+                if (pacman.x, pacman.y) == next_pos:
+                    auto_pilot_path.pop(0)
+            else:
+                pacman.animate_mouth()
+        else:
+            nx, ny = pacman.x + pacman.next_dir[0], pacman.y + pacman.next_dir[1]
+            if is_walkable(nx, ny, MAZE):
+                pacman.dir = pacman.next_dir
+            pacman.move_with_delay(MAZE)
+            pacman.animate_mouth()
         # Eat dots and power pellets
         if MAZE[pacman.y][pacman.x] == 0:
             MAZE[pacman.y][pacman.x] = 2
@@ -261,6 +373,14 @@ def main():
         for ghost in ghosts:
             ghost.draw(screen)
 
+        # Draw ghost paths in debug mode
+        if debug_mode:
+            path_colors = [RED, PINK, CYAN, ORANGE]
+            for idx, ghost in enumerate(ghosts):
+                path = get_full_path(ghost, pacman, MAZE, algorithm)
+                if path:
+                    draw_path(screen, path, path_colors[idx % len(path_colors)])
+
         # Draw score
         font = pygame.font.SysFont("Arial", 24)
         score_text = font.render(f"Score: {score}", True, WHITE)
@@ -269,6 +389,11 @@ def main():
         # Draw current algorithm
         algo_text = font.render(f"Algorithm: {algorithm.title()}", True, WHITE)
         screen.blit(algo_text, (200, HEIGHT - 30))
+
+        # Draw Auto-Pilot status
+        if auto_pilot:
+            auto_text = font.render("Auto-Pilot ON (A)", True, CYAN)
+            screen.blit(auto_text, (400, HEIGHT - 30))
 
         # Draw remaining lives as Pac-Man icons
         for i in range(lives):
@@ -281,8 +406,20 @@ def main():
             pygame.time.wait(500)  # Optional: short pause for feedback
             continue  # Skip the rest of the frame
 
-    # Show Game Over message
-    if lives == 0:
+    # Check if player won (no more dots or power pellets left)
+    won = True
+    for row in MAZE:
+        if 0 in row or 3 in row:
+            won = False
+            break
+
+    if won:
+        font = pygame.font.SysFont("Arial", 48)
+        win_text = font.render("YOU WIN!", True, GREEN)
+        screen.blit(win_text, (WIDTH // 2 - 120, HEIGHT // 2 - 24))
+        pygame.display.flip()
+        pygame.time.wait(2000)
+    elif lives == 0:
         font = pygame.font.SysFont("Arial", 48)
         game_over_text = font.render("GAME OVER", True, RED)
         screen.blit(game_over_text, (WIDTH // 2 - 120, HEIGHT // 2 - 24))
@@ -291,6 +428,68 @@ def main():
 
     pygame.quit()
     sys.exit()
+
+# --- Debug Path Drawing Helpers ---
+
+def get_full_path(ghost, pacman, maze, algorithm):
+    # Returns a list of (x, y) positions from ghost to Pac-Man, including both endpoints
+    import heapq
+    directions = [(1,0), (-1,0), (0,1), (0,-1)]
+    ROWS, COLS = len(maze), len(maze[0])
+    dist = [[float('inf') for _ in range(COLS)] for _ in range(ROWS)]
+    prev = [[None for _ in range(COLS)] for _ in range(ROWS)]
+    if algorithm == "dijkstra":
+        heap = []
+        heapq.heappush(heap, (0, ghost.x, ghost.y))
+        dist[ghost.y][ghost.x] = 0
+        while heap:
+            cost, x, y = heapq.heappop(heap)
+            if (x, y) == (pacman.x, pacman.y):
+                break
+            for d in directions:
+                nx, ny = x + d[0], y + d[1]
+                if 0 <= nx < COLS and 0 <= ny < ROWS and maze[ny][nx] != 1:
+                    new_cost = cost + 1
+                    if new_cost < dist[ny][nx]:
+                        dist[ny][nx] = new_cost
+                        prev[ny][nx] = (x, y)
+                        heapq.heappush(heap, (new_cost, nx, ny))
+    else:  # astar
+        def heuristic(x, y):
+            return abs(x - pacman.x) + abs(y - pacman.y)
+        heap = []
+        heapq.heappush(heap, (heuristic(ghost.x, ghost.y), 0, ghost.x, ghost.y))
+        dist[ghost.y][ghost.x] = 0
+        while heap:
+            f, cost, x, y = heapq.heappop(heap)
+            if (x, y) == (pacman.x, pacman.y):
+                break
+            for d in directions:
+                nx, ny = x + d[0], y + d[1]
+                if 0 <= nx < COLS and 0 <= ny < ROWS and maze[ny][nx] != 1:
+                    new_cost = cost + 1
+                    if new_cost < dist[ny][nx]:
+                        dist[ny][nx] = new_cost
+                        prev[ny][nx] = (x, y)
+                        heapq.heappush(heap, (new_cost + heuristic(nx, ny), new_cost, nx, ny))
+    # Reconstruct path
+    path = []
+    x, y = pacman.x, pacman.y
+    while prev[y][x] is not None and (x, y) != (ghost.x, ghost.y):
+        path.append((x, y))
+        x, y = prev[y][x]
+    if (x, y) == (ghost.x, ghost.y):
+        path.append((x, y))
+        path.reverse()
+        return path
+    return None
+
+def draw_path(screen, path, color):
+    # Draws a colored line following the path (list of (x, y) tuples)
+    if len(path) < 2:
+        return
+    points = [(x * TILE_SIZE + TILE_SIZE // 2, y * TILE_SIZE + TILE_SIZE // 2) for (x, y) in path]
+    pygame.draw.lines(screen, color, False, points, 4)
 
 if __name__ == "__main__":
     main()
