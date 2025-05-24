@@ -12,7 +12,7 @@ A 2D reimagining of the classic **Pac-Man** game developed in **Python (Pygame)*
 
 ## 📸 Preview
 
-<img src="screenshot.png" width="400"/> <!-- Add a screenshot here if available -->
+<img src="image.png" width="400"/> <!-- Add a screenshot here if available -->
 
 ### 🎮 Pac-Man Auto-Pilot Mode
 Pac-Man finds and follows the shortest path to the nearest pellet using A* or Dijkstra.
