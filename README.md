@@ -12,17 +12,17 @@ A 2D reimagining of the classic **Pac-Man** game developed in **Python (Pygame)*
 
 ## 📸 Preview
 
-![Game Screenshot](image.png) <!-- Add a screenshot here if available -->
+<img src="screenshot.png" width="400"/> <!-- Add a screenshot here if available -->
 
 ### 🎮 Pac-Man Auto-Pilot Mode
 Pac-Man finds and follows the shortest path to the nearest pellet using A* or Dijkstra.
 
-![Auto Pilot Demo](pacman_auto.gif)
+<img src="pacman_auto.gif" width="400"/>
 
 ### 🎮 Ghost Auto-Pilot Mode
 Ghosts find and follow the shortest path to the nearest pellet using A* or Dijkstra.
 
-![Ghost Auto Pilot Demo](ghost_auto.gif)
+<img src="ghost_astar.gif" width="400"/>
 
 ## 🛠️ Technologies Used
 
