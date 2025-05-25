@@ -4,11 +4,13 @@ A 2D reimagining of the classic **Pac-Man** game developed in **Python (Pygame)*
 
 ## 🎯 Features
 
-- 🧠 Ghosts powered by **Dijkstra** or **A\*** algorithms for optimal pathfinding  
-- 🎮 Real-time gameplay with **Pygame**  
-- 🌀 Power-ups like speed boosts, teleportation, and invisibility *(coming soon)*  
-- 🎨 Clean grid-based movement with animation and sound effects  
-- 🧱 Wall and node-based map structure for flexible level design  
+- 🧠 Ghosts powered by **Dijkstra** or **A\*** algorithms for optimal pathfinding. 
+- 🎮 Real-time gameplay with **Pygame**.
+- 🌀 Power-ups like speed boosts, teleportation, and invisibility *(coming soon)*. 
+- 🎨 Clean grid-based movement with animation and sound effects.
+- 🤖 Auto-Pilot Mode: Let Pac-Man control itself using built-in logic for demonstrations or stress testing.
+- 🧪 Debug Mode: Visualize ghost paths, graph nodes, and decision logic in real-time to aid development and understanding.
+- 🧱 Wall and node-based map structure for flexible level design.
 
 ## 📸 Preview
 
