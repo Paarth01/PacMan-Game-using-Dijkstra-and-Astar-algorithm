@@ -26,9 +26,9 @@ Ghosts find and follow the shortest path to the nearest pellet using A* or Dijks
 
 ## 🛠️ Technologies Used
 
--Python 3.x — Core game and logic language
--Pygame — For graphics, input handling, and game loop
--Custom Graph Implementation — Built from scratch to support Dijkstra and A* pathfinding
+- Python 3.x — Core game and logic language
+- Pygame — For graphics, input handling, and game loop
+- Custom Graph Implementation — Built from scratch to support Dijkstra and A* pathfinding
 
 ## 🚀 Getting Started
 
